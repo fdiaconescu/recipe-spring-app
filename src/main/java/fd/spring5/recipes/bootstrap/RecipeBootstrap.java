@@ -4,15 +4,18 @@ import fd.spring5.recipes.domain.*;
 import fd.spring5.recipes.repositories.CategoryRepository;
 import fd.spring5.recipes.repositories.RecipeRepository;
 import fd.spring5.recipes.repositories.UnitOfMeasureRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -25,8 +28,11 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         this.categoryRepo = categoryRepo;
         this.ufmRepo = ufmRepo;
         this.recipeRepo = recipeRepo;
+
+        log.debug("*****************Loadinf bootstrap data***************");
     }
 
+    @Transactional
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         recipeRepo.saveAll(getRecipes());
@@ -102,7 +108,6 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         Notes guacNotes = new Notes();
         guacNotes.setRecipeNotes("Read more at https://www.simplyrecipes.com/recipes/perfect_guacamole/");
-        guacNotes.setRecipe(guacRecipe);
         guacRecipe.setNotes(guacNotes);
 
         //Ingredients
@@ -150,7 +155,6 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
                 "\n" +
                 "Read more: http://www.simplyrecipes.com/recipes/spicy_grilled_chicken_tacos/#ixzz4jvu7Q0MJ");
 
-        tacoNotes.setRecipe(tacosRecipe);
         tacosRecipe.setNotes(tacoNotes);
 
         tacosRecipe.addIngredient(new Ingredient("Ancho Chili Powder", new BigDecimal(2), tbspUom));

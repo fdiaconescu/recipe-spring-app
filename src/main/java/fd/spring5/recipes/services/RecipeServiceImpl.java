@@ -2,11 +2,13 @@ package fd.spring5.recipes.services;
 
 import fd.spring5.recipes.domain.Recipe;
 import fd.spring5.recipes.repositories.RecipeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class RecipeServiceImpl implements RecipeService{
 
@@ -18,6 +20,7 @@ public class RecipeServiceImpl implements RecipeService{
 
     @Override
     public Set<Recipe> getRecipes() {
+        log.debug("Lombok log");
         Set<Recipe> recipes = new HashSet<Recipe>();
         recipeRepository.findAll().iterator().forEachRemaining(recipes::add);
 
