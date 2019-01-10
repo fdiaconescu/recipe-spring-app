@@ -9,6 +9,8 @@ import java.util.Set;
 
 @Data
 @Entity
+@Setter
+@Getter
 @Table(name = "recipe")
 public class Recipe {
 
@@ -42,8 +44,10 @@ public class Recipe {
     private Set<Ingredient> ingredients = new HashSet<Ingredient>();
 
     public void setNotes(Notes notes) {
-        this.notes = notes;
-        notes.setRecipe(this);
+        if(notes != null) {
+            this.notes = notes;
+            notes.setRecipe(this);
+        }
     }
 
     public Recipe addIngredient(Ingredient ingredient){
