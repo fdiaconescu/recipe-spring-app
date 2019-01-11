@@ -100,7 +100,6 @@ public class RecipeControllerTest {
 
         mockMvc.perform(get("/recipe/2/delete"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/"))
-                .andExpect(model().attributeExists("recipe"));
+                .andExpect(view().name("/"));
     }
 }
