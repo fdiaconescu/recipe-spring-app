@@ -3,6 +3,7 @@ package fd.spring5.recipes.services;
 import fd.spring5.recipes.converters.RecipeCommandToRecipe;
 import fd.spring5.recipes.converters.RecipeToRecipeCommand;
 import fd.spring5.recipes.domain.Recipe;
+import fd.spring5.recipes.exceptions.NotFoundException;
 import fd.spring5.recipes.repositories.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,5 +75,17 @@ public class RecipeServiceImplTest {
         recipeService.deleteById(idToDelete);
 
         verify(recipeRepository, times(1)).deleteById(anyLong());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void getRecipeByIdTestNotFound() throws Exception {
+
+        Optional<Recipe> recipeOptional = Optional.empty();
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        Recipe recipeReturned = recipeService.findById(1L);
+
+        //should go boom
     }
 }

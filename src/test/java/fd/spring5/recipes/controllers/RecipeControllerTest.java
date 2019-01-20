@@ -2,6 +2,7 @@ package fd.spring5.recipes.controllers;
 
 import fd.spring5.recipes.commands.RecipeCommand;
 import fd.spring5.recipes.domain.Recipe;
+import fd.spring5.recipes.exceptions.NotFoundException;
 import fd.spring5.recipes.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,8 @@ public class RecipeControllerTest {
         MockitoAnnotations.initMocks(this);
 
         controller = new RecipeController(recipeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ControllerExceptionHandler()).build();
     }
 
     @Test
@@ -74,10 +76,26 @@ public class RecipeControllerTest {
         mockMvc.perform(post("/recipe")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "")
-                .param("description", "some string")
-        )
+                .param("description", "desc").param("directions", "dirs"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/2/show"));
+    }
+
+    @Test
+    public void testPostNewRecipeFormValidationFail() throws Exception {
+        RecipeCommand command = new RecipeCommand();
+        command.setId(2L);
+
+        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+
+        mockMvc.perform(post("/recipe")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "")
+
+        )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("recipe"))
+                .andExpect(view().name("recipe/recipeform"));
     }
 
     @Test
@@ -100,5 +118,27 @@ public class RecipeControllerTest {
                 .andExpect(view().name("redirect:/"));
 
         verify(recipeService, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    public void testRecipeNotFound() throws Exception {
+        when(recipeService.findById(anyLong())).thenThrow( NotFoundException.class);
+
+        mockMvc.perform(get("/recipe/22/show"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("404Error"));
+
+
+    }
+
+    @Test
+    public void testRecipeNumberFormatException() throws Exception {
+        //when(recipeService.findById(anyLong())).thenThrow( NumberFormatException.class);
+
+        mockMvc.perform(get("/recipe/dfdfdfd/show"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400Error"));
+
+
     }
 }
